@@ -21,7 +21,20 @@ class Game:
         while self.game_is_running:
             source, destination = self.get_user_input()
             if self.check_move_correctness(source, destination):
-                self.board.move_pawn(source, destination)
+                if self.board.get_pawn(source).get_name() == "King":
+                    match destination:
+                        case (0, 2):
+                            self.board.do_castling("Left down")
+                        case (0, 6):
+                            self.board.do_castling("Right down")
+                        case (7, 2):
+                            self.board.do_castling("Left up")
+                        case (7, 6):
+                            self.board.do_castling("Right up")
+                        case _:
+                            self.board.move_pawn(source, destination)
+                else:
+                    self.board.move_pawn(source, destination)
                 self.do_swap = True
 
                 if self.check_evolution_possibility(destination):
@@ -40,7 +53,6 @@ class Game:
             self.update()
 
     def update(self):
-        # TODO: Add statistics (time per player, killed pawns etc.)
         os.system("cls")
         print(self.player_turn)
         # self.board.print_pawns()
@@ -103,6 +115,7 @@ class Game:
         match self.board.get_pawn(source).get_name():
             case "King":
                 possible_moves = self.king_moves(source)
+                possible_moves += self.check_castling(source)
             case "Queen":
                 possible_moves = self.queen_moves(source)
             case "Rook":
@@ -207,6 +220,34 @@ class Game:
             break
         return all_moves
 
+    def check_castling(self, source):
+        all_moves = []
+        king = self.board.get_pawn(source)
+        rook_left = self.board.get_pawn((source[0], 0))
+        rook_right = self.board.get_pawn((source[0], 7))
+
+        if king.get_moved():
+            return []
+        if not rook_left.get_moved():
+            append = True
+            for i in range(1, 4):
+                position_to_check = (source[0], i)
+                if self.board.get_pawn(position_to_check).get_name() is not None:
+                    append = False
+                    break
+            if append:
+                all_moves.append((source[0], 2))
+        if not rook_right.get_moved():
+            append = True
+            for i in range(5, 7):
+                position_to_check = (source[0], i)
+                if self.board.get_pawn(position_to_check).get_name() is not None:
+                    append = False
+                    break
+            if append:
+                all_moves.append((source[0], 6))
+        return all_moves
+
     def check_input_correctness(self, user_input):
         return_value = True
         if len(user_input) > 2:
@@ -233,3 +274,5 @@ class Game:
 
     def stop_game(self):
         self.game_is_running = False
+
+

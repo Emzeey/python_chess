@@ -75,6 +75,21 @@ class Board:
         self.board[destination[0]][destination[1]] = self.board[source[0]][source[1]]
         self.board[source[0]][source[1]] = pawn.Pawn()
 
+    def do_castling(self, castling_type):
+        match castling_type:
+            case "Left down":
+                self.move_pawn((0, 0), (0, 3))
+                self.move_pawn((0, 4), (0, 2))
+            case "Left up":
+                self.move_pawn((7, 0), (7, 3))
+                self.move_pawn((7, 4), (7, 2))
+            case "Right down":
+                self.move_pawn((0, 7), (0, 5))
+                self.move_pawn((0, 4), (0, 6))
+            case "Right up":
+                self.move_pawn((7, 7), (7, 5))
+                self.move_pawn((7, 4), (7, 6))
+
     def sub_pawn(self, position):
         target_pawn = self.board[position[0]][position[1]]
         self.pawns_alive[target_pawn.get_color()][target_pawn.get_name()] -= 1
