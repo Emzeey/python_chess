@@ -200,6 +200,8 @@ class Game:
 
         for i in (-1, 1):
             move = (source[0] + offset, source[1] + i)
+            if move[0] > 7 or move[0] < 0 or move[1] > 7 or move[1] < 0:
+                continue
             if self.board.get_pawn(move).get_name() is not None:
                 all_moves.append(move)
         return all_moves
